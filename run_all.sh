@@ -1,36 +1,36 @@
 #!/bin/bash
 
-# Встановлення залежностей
 pip install -r requirements.txt
 
-# Запуск Docker-контейнера з PostgreSQL (якщо ще не запущено)
+if [ ! -f .env ]; then
+    echo "Створення .env файлу з прикладу .env.example..."
+    cp .env.example .env
+    echo "Створено .env файл. Будь ласка, перевірте та оновіть налаштування, якщо потрібно."
+fi
+
+source .env
+
 if ! docker ps | grep -q "postgres"; then
     echo "Запуск контейнера PostgreSQL..."
-    docker run --name pg-student-db -p 5432:5432 -e POSTGRES_PASSWORD=mysecretpassword -d postgres
+    docker run --name pg-student-db -p ${POSTGRES_PORT}:5432 -e POSTGRES_PASSWORD=${POSTGRES_PASSWORD} -d postgres
     
-    # Почекати, поки PostgreSQL повністю запуститься
     sleep 5
     
-    # Створення бази даних
-    docker exec -it pg-student-db psql -U postgres -c "CREATE DATABASE student_db"
+    docker exec -it pg-student-db psql -U ${POSTGRES_USER} -c "CREATE DATABASE ${POSTGRES_DB}"
 else
     echo "PostgreSQL вже запущено"
 fi
 
-# Ініціалізація Alembic (якщо ще не ініціалізовано)
 if [ ! -d "alembic" ]; then
     echo "Ініціалізація Alembic..."
     bash alembic_setup.sh
 else
     echo "Alembic вже ініціалізовано"
-    # Виконання міграцій
     alembic upgrade head
 fi
 
-# Заповнення бази даних випадковими даними
 echo "Заповнення бази даних..."
 python seed.py
 
-# Виконання запитів
 echo "Виконання запитів..."
 python my_select.py

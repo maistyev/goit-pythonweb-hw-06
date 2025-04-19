@@ -27,7 +27,7 @@
 
 ```bash
 git clone <repository-url>
-cd student-db
+cd goit-pythonweb-hw-06
 ```
 
 ### 2. Створення та активація віртуального середовища
@@ -45,7 +45,25 @@ venv\Scripts\activate  # для Windows
 pip install -r requirements.txt
 ```
 
-### 4. Запуск PostgreSQL у Docker
+### 4. Налаштування змінних середовища
+
+Скопіюйте файл `.env.example` у файл `.env` та відредагуйте його згідно з вашими налаштуваннями:
+
+```bash
+cp .env.example .env
+```
+
+Відкрийте файл `.env` та змініть параметри підключення до бази даних, якщо потрібно:
+
+```
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=ваш_пароль
+POSTGRES_HOST=localhost
+POSTGRES_PORT=5432
+POSTGRES_DB=student_db
+```
+
+### 5. Запуск PostgreSQL у Docker
 
 ```bash
 docker run --name pg-student-db -p 5432:5432 -e POSTGRES_PASSWORD=mysecretpassword -d postgres
@@ -57,19 +75,19 @@ docker run --name pg-student-db -p 5432:5432 -e POSTGRES_PASSWORD=mysecretpasswo
 docker exec -it pg-student-db psql -U postgres -c "CREATE DATABASE student_db"
 ```
 
-### 5. Налаштування та запуск міграцій
+### 6. Налаштування та запуск міграцій
 
 ```bash
 bash alembic_setup.sh
 ```
 
-### 6. Заповнення бази даних тестовими даними
+### 7. Заповнення бази даних тестовими даними
 
 ```bash
 python seed.py
 ```
 
-### 7. Виконання запитів до бази даних
+### 8. Виконання запитів до бази даних
 
 ```bash
 python my_select.py
@@ -91,6 +109,9 @@ bash run_all.sh
 - **run_all.sh** - Скрипт для автоматизації всіх етапів налаштування і запуску
 - **requirements.txt** - Залежності проекту
 - **alembic/** - Конфігурація і міграції Alembic
+- **.env** - Файл з конфіденційними даними підключення до бази даних (не включений у репозиторій)
+- **.env.example** - Приклад файлу .env з шаблоном необхідних змінних середовища
+- **.gitignore** - Список файлів, які не повинні відстежуватися системою контролю версій
 
 ## Реалізовані запити
 

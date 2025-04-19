@@ -1,23 +1,32 @@
 #!/bin/bash
 
-# Встановлення необхідних пакетів
 pip install sqlalchemy alembic psycopg2-binary faker python-dotenv
 
-# Ініціалізація Alembic
+if [ ! -f .env ]; then
+    echo "Створення .env файлу з прикладу .env.example..."
+    cp .env.example .env
+    echo "Створено .env файл. Будь ласка, перевірте та оновіть налаштування, якщо потрібно."
+fi
+
+source .env
+
 alembic init alembic
 
-# Внесення змін в alembic.ini
-# Замінюємо URL бази даних
-sed -i 's|sqlalchemy.url = driver://user:pass@localhost/dbname|sqlalchemy.url = postgresql://postgres:mysecretpassword@localhost:5432/student_db|g' alembic.ini
 
-# Внесення змін у файл env.py для імпорту моделей
+sed -i "s|sqlalchemy.url = driver://user:pass@localhost/dbname|sqlalchemy.url = ${DATABASE_URL}|g" alembic.ini
+
 cat > alembic/env.py << 'EOF'
 from logging.config import fileConfig
+import os
+from dotenv import load_dotenv
 
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
 from alembic import context
+
+# Завантаження змінних середовища
+load_dotenv()
 
 # Імпорт моделей для створення міграцій
 from models import Base
